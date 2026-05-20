@@ -28,15 +28,15 @@ Do not review the diff in isolation. Read the surrounding code to understand:
 - What invariants or assumptions does the broader system rely on?
 - How does data flow through the affected area?
 
-Read `@docs/code` to understand established patterns and conventions. If `docs/code` does not exist, note it and review against standard conventions for the detected stack.
+Read `docs` to understand established patterns and conventions. If `docs` does not exist, note it and review against standard conventions for the detected stack.
 
 ### 3. Load Requirements — Find the source of truth
 
 Identify the requirement(s) this change is meant to satisfy. Check in order:
 
 1. **Linked issue or task** — if the branch name or commit messages reference an issue, read it.
-2. **PRDs** — check `@docs/prds` for a matching product requirement doc.
-3. **ADRs** — check `@docs/adrs` for architectural decisions relevant to the changed area.
+2. **PRDs** — check linear for a matching product requirement doc. Can check linear for relevant docs as well
+3. **ADRs** — check linear for architectural decisions relevant to the changed area.
 4. **Task list** — if a task list exists for this feature, read it to understand scope and completion criteria.
 
 If no requirements doc can be found, note it in the report and review on Axis 1 only.
@@ -85,7 +85,7 @@ Group findings by axis. Axis 1 first, then Axis 2.
 
 If no issues are found on either axis, say so plainly. Do not pad the review.
 
-Write the full report into an HTML file and place in `@docs/reports` with a meaningful name.
+Write the full report into an HTML file and place in `docs/reports` with a meaningful name.
 
 ## Constraints
 

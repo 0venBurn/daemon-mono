@@ -1,11 +1,11 @@
 ---
 name: to-adr
-description: Generate an Architecture Decision Record from the current conversation context and write it to docs/adr/ with sequential numbering. Use when a decision has crystallised that is hard to reverse, surprising without context, and the result of a real trade-off.
+description: Generate an Architecture Decision Record from the current conversation context and push it to Linear. Ask which project to add it to. Use when a decision has crystallised that is hard to reverse, surprising without context, and the result of a real trade-off.
 ---
 
 # To ADR
 
-Generate an ADR from the current conversation context and save it to `docs/adr/NNNN-slug.md`.
+Generate an ADR from the current conversation context and push it to Linear. Ask which project to add it to.
 
 Do NOT create an ADR unless the decision meets all three criteria:
 
@@ -44,23 +44,13 @@ Examples of decisions that typically qualify:
 
 If any criterion fails, tell the user this doesn't warrant an ADR and explain why. Skip the rest.
 
-### 3. Determine the number and slug
+### 3. Determine the title and project
 
-Scan `docs/adr/` for the highest existing number:
+Ask the user: _What should the title be? (3-6 words, e.g. "Event Sourced Orders" or "Postgres for Write Model")_
 
-```bash
-ls docs/adr/ 2>/dev/null | grep '^[0-9]' | sort -n | tail -1
-```
+Ask the user: _Which Linear project should this ADR go into? (e.g. "Platform", "Web", "Mobile")_
 
-Increment by one and zero-pad to 4 digits (e.g. `0001`, `0002`, ..., `0042`).
-
-Derive a slug from the decision: lowercase, hyphens for spaces, strip punctuation. Keep it short — 3-6 words. Examples:
-
-- `event-sourced-orders`
-- `postgres-for-write-model`
-- `api-versioning-v2`
-
-The filename is `NNNN-slug.md`.
+Use the title to derive a slug: lowercase, hyphens for spaces, strip punctuation.
 
 ### 4. Propose the ADR to the user
 
@@ -81,21 +71,22 @@ Ask: _Does this capture the decision accurately? Anything to add, remove, or cla
 
 Iterate until the user approves.
 
-### 5. Write the ADR file
+### 5. Push the ADR to Linear
 
-Create `docs/adr/` if it doesn't exist:
+Use the Linear skill to create a new document in the specified project with the ADR content.
 
-```bash
-mkdir -p docs/adr
-```
+Set the title to: `ADR: {Short title}`
 
-Write using this template. Keep it concise — an ADR can be a single paragraph. Only include optional sections when they add genuine value.
+Add labels: `adr`, `architecture`, `decision`
+
+Link to any relevant issues, PRDs, or existing ADRs.
 
 <adr-template>
 ```md
 # {Short title of the decision}
 
 {1-3 sentences: what's the context, what did we decide, and why.}
+
 ```
 
 ## Optional sections (only when they add genuine value)
@@ -103,32 +94,42 @@ Write using this template. Keep it concise — an ADR can be a single paragraph.
 If `Status` is included, add it as frontmatter:
 
 ```
+
 ---
-status: proposed | accepted | deprecated | superseded by ADR-NNNN
----
+
+## status: proposed | accepted | deprecated | superseded by ADR-NNNN
+
 ```
 
 If alternatives are worth remembering:
 
 ```
+
 ## Considered Options
 
 - **Option A**: {description}. Rejected because {reason}.
 - **Option B**: {description}. Rejected because {reason}.
+
 ```
 
 If downstream effects are non-obvious:
 
 ```
+
 ## Consequences
 
 - {Effect 1}
 - {Effect 2}
+
 ```
 </adr-template>
 
 ### 6. Confirm
 
 ```
-Wrote docs/adr/NNNN-slug.md
+
+Pushed ADR to Linear: {project}/{slug}
+
+```
+
 ```

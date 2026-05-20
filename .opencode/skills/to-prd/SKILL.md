@@ -1,11 +1,11 @@
 ---
 name: to-prd
-description: Generate a Product Requirements Document from the current conversation context and write it to docs/prds/ with sequential numbering. Use when a feature spec has emerged that should be captured as a permanent artifact before implementation.
+description: Generate a Product Requirements Document from the current conversation context and push it to Linear. Ask which project to add it to. Use when a feature spec has emerged that should be captured as a permanent artifact before implementation.
 ---
 
 # To PRD
 
-Generate a PRD from the current conversation context and save it to `docs/prds/NNNN-slug.md`.
+Generate a PRD from the current conversation context and save it to linear. Ask which project to add it to.
 
 Do NOT interview the user — just synthesize what you already know from the conversation.
 
@@ -35,23 +35,13 @@ A deep module (as opposed to a shallow module) is one which encapsulates a lot o
 
 Ask the user: _Do these modules match your expectations? Which modules do you want tests written for?_
 
-### 4. Determine the number and slug
+### 4. Determine the title and project
 
-Scan `docs/prds/` for the highest existing number:
+Ask the user: _What should the title be? (3-6 words, e.g. "Customer Portal" or "Payment Retry Logic")_
 
-```bash
-ls docs/prds/ 2>/dev/null | grep '^[0-9]' | sort -n | tail -1
-```
+Ask the user: _Which Linear project should this PRD go into? (e.g. "Platform", "Web", "Mobile")_
 
-Increment by one and zero-pad to 4 digits (e.g. `0001`, `0002`, ..., `0042`).
-
-Derive a slug from the feature name: lowercase, hyphens for spaces, strip punctuation. Keep it short — 3-6 words. Examples:
-
-- `customer-portal`
-- `payment-retry-logic`
-- `api-rate-limiting`
-
-The filename is `NNNN-slug.md`.
+Use the title to derive a slug: lowercase, hyphens for spaces, strip punctuation.
 
 ### 5. Propose the PRD outline to the user
 
@@ -71,15 +61,15 @@ Ask: _Does this scope look right? Anything missing or over-scoped?_
 
 Iterate until the user approves.
 
-### 6. Write the PRD file
+### 6. Push the PRD to Linear
 
-Create `docs/prds/` if it doesn't exist:
+Use the Linear skill to create a new document in the specified project with the PRD content.
 
-```bash
-mkdir -p docs/prds
-```
+Set the title to: `PRD: {Feature name}`
 
-Write using this template.
+Add labels: `prd`, `spec`
+
+Link to any relevant issues or existing ADRs.
 
 <prd-template>
 ```md
@@ -130,11 +120,16 @@ Things that are explicitly out of scope for this PRD.
 ## Further Notes
 
 Any further notes about the feature.
+
 ```
 </prd-template>
 
 ### 7. Confirm
 
 ```
-Wrote docs/prds/NNNN-slug.md
+
+Pushed PRD to Linear: {project}/{slug}
+
+```
+
 ```
