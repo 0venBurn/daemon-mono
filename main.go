@@ -22,6 +22,11 @@ type ToolDefinition struct {
 }
 
 func main() {
+	if err := loadAnthropicAPIKeyFromDotEnv(".env"); err != nil {
+		fmt.Printf("Error loading .env: %s\n", err.Error())
+		return
+	}
+
 	client := anthropic.NewClient()
 
 	scanner := bufio.NewScanner(os.Stdin)
@@ -38,6 +43,38 @@ func main() {
 	if err != nil {
 		fmt.Printf("Error: %s\n", err.Error())
 	}
+}
+
+func loadAnthropicAPIKeyFromDotEnv(filePath string) error {
+	if os.Getenv("ANTHROPIC_API_KEY") != "" {
+		return nil
+	}
+
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+
+	for _, line := range strings.Split(string(content), "\n") {
+		line = strings.TrimSpace(line)
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+
+		key, value, ok := strings.Cut(line, "=")
+		if !ok || strings.TrimSpace(key) != "ANTHROPIC_API_KEY" {
+			continue
+		}
+
+		value = strings.TrimSpace(value)
+		value = strings.Trim(value, "\"'")
+		return os.Setenv("ANTHROPIC_API_KEY", value)
+	}
+
+	return nil
 }
 
 func NewAgent(client *anthropic.Client, getUserMessage func() (string, bool), tools []ToolDefinition) *Agent {
@@ -112,7 +149,7 @@ func (a *Agent) runInference(ctx context.Context, conversation []anthropic.Messa
 	}
 
 	message, err := a.client.Messages.New(ctx, anthropic.MessageNewParams{
-		Model:     anthropic.ModelClaudeHaiku4_5,
+		Model:     anthropic.ModelClaudeSonnet4_6,
 		MaxTokens: int64(1024),
 		Messages:  conversation,
 		Tools:     anthropicTools,
@@ -280,11 +317,17 @@ func EditFile(input json.RawMessage) (string, error) {
 	}
 
 	oldContent := string(content)
-	newContent := strings.Replace(oldContent, editFileInput.OldStr, editFileInput.NewStr, -1)
-
-	if oldContent == newContent && editFileInput.OldStr != "" {
-		return "", fmt.Errorf("old_str not found in file")
+	if editFileInput.OldStr != "" {
+		matches := strings.Count(oldContent, editFileInput.OldStr)
+		if matches == 0 {
+			return "", fmt.Errorf("old_str not found in file")
+		}
+		if matches > 1 {
+			return "", fmt.Errorf("old_str matched %d times in file", matches)
+		}
 	}
+
+	newContent := strings.Replace(oldContent, editFileInput.OldStr, editFileInput.NewStr, 1)
 
 	err = os.WriteFile(editFileInput.Path, []byte(newContent), 0o644)
 	if err != nil {
