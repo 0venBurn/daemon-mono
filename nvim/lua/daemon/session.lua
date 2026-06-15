@@ -12,6 +12,20 @@ local notify = core.notify
 
 local M = {}
 
+local function stop_fff_background_monitor()
+  -- Do not `require` fff here. If it is loaded and watching, stop its native
+  -- background watcher before daemon starts mutating buffers/files.
+  local file_picker = package.loaded["fff.file_picker"]
+  if file_picker and file_picker.stop_background_monitor then
+    pcall(file_picker.stop_background_monitor)
+  end
+
+  local fuzzy = package.loaded["fff.fuzzy"]
+  if fuzzy and fuzzy.stop_background_monitor then
+    pcall(fuzzy.stop_background_monitor)
+  end
+end
+
 local function current_context(visual)
   local buf, file = buffer.require_named_current_buffer()
   if not buf then
@@ -46,6 +60,7 @@ local function submit_input(intent, text, ctx)
   if not rpc.ensure_daemon() then
     return
   end
+  stop_fff_background_monitor()
   ctx = ctx or current_context(false)
   if not ctx then
     return
