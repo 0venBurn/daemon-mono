@@ -8,6 +8,8 @@ Licensed under the MIT License. See [LICENSE](LICENSE).
 
 Daemon is not meant to be one more chat UI. Goal: one shared Go core for model loops, tools, context, sessions, profiles, validation, events, and extensions; multiple replaceable surfaces over it.
 
+![daemon demo](./daemon-demo.mp4)
+
 ## Current state
 
 Working proof-of-concept:
