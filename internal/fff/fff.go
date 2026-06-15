@@ -157,23 +157,23 @@ func goSearchResult(sr *C.FffSearchResult) SearchResult {
 // --- GrepMatch ---
 
 type GrepMatch struct {
-	RelativePath     string
-	FileName         string
-	GitStatus        string
-	LineContent      string
-	LineNumber       uint64
-	Col              uint32
-	IsDefinition     bool
-	IsBinary         bool
+	RelativePath       string
+	FileName           string
+	GitStatus          string
+	LineContent        string
+	LineNumber         uint64
+	Col                uint32
+	IsDefinition       bool
+	IsBinary           bool
 	TotalFrecencyScore int64
 }
 
 func goGrepMatch(m *C.FffGrepMatch) GrepMatch {
 	gm := GrepMatch{
-		LineNumber:       uint64(m.line_number),
-		Col:              uint32(m.col),
-		IsDefinition:     bool(m.is_definition),
-		IsBinary:         bool(m.is_binary),
+		LineNumber:         uint64(m.line_number),
+		Col:                uint32(m.col),
+		IsDefinition:       bool(m.is_definition),
+		IsBinary:           bool(m.is_binary),
 		TotalFrecencyScore: int64(m.total_frecency_score),
 	}
 	if m.relative_path != nil {
@@ -233,11 +233,11 @@ func joinStrings(ss []string, sep string) string {
 // --- GrepResult ---
 
 type GrepResult struct {
-	Items            []GrepMatch
-	TotalMatched     uint32
+	Items              []GrepMatch
+	TotalMatched       uint32
 	TotalFilesSearched uint32
-	TotalFiles       uint32
-	FilteredFileCount uint32
+	TotalFiles         uint32
+	FilteredFileCount  uint32
 }
 
 func goGrepResult(gr *C.FffGrepResult) GrepResult {
@@ -385,19 +385,19 @@ type SearchOpt struct {
 }
 
 type searchConfig struct {
-	CurrentFile    string
-	MaxThreads     uint32
-	Page           uint32
-	PageSize       uint32
-	ComboBoost     int32
-	MinComboCount  uint32
+	CurrentFile   string
+	MaxThreads    uint32
+	Page          uint32
+	PageSize      uint32
+	ComboBoost    int32
+	MinComboCount uint32
 }
 
 func applySearchOpts(opts ...SearchOpt) searchConfig {
 	cfg := searchConfig{
 		MaxThreads:    0, // auto
-		PageSize:     30,
-		ComboBoost:   0, // default
+		PageSize:      30,
+		ComboBoost:    0, // default
 		MinComboCount: 0,
 	}
 	for _, o := range opts {
@@ -419,9 +419,9 @@ func WithPageSize(n uint32) SearchOpt {
 type GrepMode uint8
 
 const (
-	GrepPlain  GrepMode = 0
-	GrepRegex  GrepMode = 1
-	GrepFuzzy  GrepMode = 2
+	GrepPlain GrepMode = 0
+	GrepRegex GrepMode = 1
+	GrepFuzzy GrepMode = 2
 )
 
 type GrepOpt struct {
@@ -429,16 +429,16 @@ type GrepOpt struct {
 }
 
 type grepConfig struct {
-	Mode                 GrepMode
-	MaxFileSize          uint64
-	MaxMatchesPerFile    uint32
-	SmartCase            bool
-	FileOffset           uint32
-	PageLimit            uint32
-	TimeBudgetMs         uint64
-	BeforeContext        uint32
-	AfterContext         uint32
-	ClassifyDefinitions  bool
+	Mode                GrepMode
+	MaxFileSize         uint64
+	MaxMatchesPerFile   uint32
+	SmartCase           bool
+	FileOffset          uint32
+	PageLimit           uint32
+	TimeBudgetMs        uint64
+	BeforeContext       uint32
+	AfterContext        uint32
+	ClassifyDefinitions bool
 }
 
 func applyGrepOpts(opts ...GrepOpt) grepConfig {
