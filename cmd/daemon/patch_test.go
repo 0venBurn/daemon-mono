@@ -22,13 +22,13 @@ func TestValidatePatchResponseAcceptsSmallPatchInsideLargeOldNew(t *testing.T) {
 	}
 }
 
-func TestValidatePatchResponseRejectsBroadPatch(t *testing.T) {
+func TestValidatePatchResponseAcceptsBroadExactPatch(t *testing.T) {
 	old := "func x() {\n\tprintln(1)\n\tprintln(2)\n}\n"
 	new := "func x() {\n\tif true {\n\t\tprintln(3)\n\t\tprintln(4)\n\t\tprintln(5)\n\t}\n}\n"
 	patch := PatchResponse{Edits: []PatchEdit{{Old: old, New: new}}}
 	_, err := validatePatchResponse(old, "change x", patch)
-	if err == nil {
-		t.Fatal("expected broad patch rejection")
+	if err != nil {
+		t.Fatal(err)
 	}
 }
 

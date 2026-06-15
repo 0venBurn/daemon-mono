@@ -52,3 +52,17 @@ func TestSplitForVisibleStreaming(t *testing.T) {
 		}
 	}
 }
+
+func TestShouldUseFastPatchForCurrentBufferEdit(t *testing.T) {
+	p := StartParams{File: "/tmp/a.py", Content: "def f():\n    pass\n", Prompt: "implement the funcs in this file"}
+	if !shouldUseFastPatch(p) {
+		t.Fatal("expected current-buffer edit to use fast patch")
+	}
+}
+
+func TestShouldUseFastPatchSkipsProjectSearch(t *testing.T) {
+	p := StartParams{File: "/tmp/a.py", Content: "def f():\n    pass\n", Prompt: "search the repo and update callers"}
+	if shouldUseFastPatch(p) {
+		t.Fatal("expected project/search prompt to use tool agent")
+	}
+}

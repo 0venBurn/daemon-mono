@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 )
 
@@ -110,10 +111,6 @@ func validatePatchResponse(content, prompt string, patch PatchResponse) ([]Patch
 				problems = append(problems, fmt.Sprintf("edit %d insert_at_selection_end has empty text", i))
 				continue
 			}
-			if !isExplicitRewriteIntent(prompt) && isBroadInsert(edit.Text) {
-				problems = append(problems, fmt.Sprintf("edit %d insert text is too broad; add fewer methods or explicitly ask to rewrite/regenerate", i))
-				continue
-			}
 			valid = append(valid, edit)
 			current += edit.Text
 			continue
@@ -164,15 +161,6 @@ func validatePatchResponse(content, prompt string, patch PatchResponse) ([]Patch
 				continue
 			}
 			problems = append(problems, fmt.Sprintf("edit %d old text matched %d times; choose a more specific one-line old value", i, matches))
-			continue
-		}
-
-		if !isExplicitRewriteIntent(prompt) && isBroadPatch(edit.Old, edit.New) {
-			oldMidLen, newMidLen, oldMidLines, newMidLines := replacementSize(edit.Old, edit.New)
-			problems = append(problems, fmt.Sprintf(
-				"edit %d is too broad after minimal diff (old_mid_len=%d new_mid_len=%d old_mid_lines=%d new_mid_lines=%d); use smaller one-line old/new edits",
-				i, oldMidLen, newMidLen, oldMidLines, newMidLines,
-			))
 			continue
 		}
 
@@ -326,8 +314,20 @@ func parsePatchResponse(raw string) (PatchResponse, error) {
 		return patch, fmt.Errorf("patch response was not JSON")
 	}
 	text = text[start : end+1]
+	text = stripTrailingCommas(text)
 	if err := json.Unmarshal([]byte(text), &patch); err != nil {
 		return patch, fmt.Errorf("invalid patch JSON: %w", err)
 	}
 	return patch, nil
+}
+
+var trailingCommaRE = regexp.MustCompile(`,\s*([}\]])`)
+
+func stripTrailingCommas(s string) string {
+	previous := ""
+	for previous != s {
+		previous = s
+		s = trailingCommaRE.ReplaceAllString(s, `$1`)
+	}
+	return s
 }
