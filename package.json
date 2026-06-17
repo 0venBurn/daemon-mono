@@ -1,0 +1,17 @@
+{
+  "name": "daemon-flue",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "flue:dev": "flue dev --target node",
+    "flue:run": "flue run fix-ci --target node",
+    "flue:build": "flue build --target node"
+  },
+  "dependencies": {
+    "@flue/runtime": "^1.0.0-beta.1",
+    "valibot": "^1.4.1"
+  },
+  "devDependencies": {
+    "@flue/cli": "^1.0.0-beta.1"
+  }
+}

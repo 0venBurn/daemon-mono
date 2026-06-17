@@ -1,0 +1,48 @@
+name: CI Fixer
+
+on:
+  workflow_run:
+    workflows: ["test"]
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      job:
+        description: 'Failing job name'
+        required: false
+        default: ''
+      log:
+        description: 'CI failure log (leave empty to auto-detect)'
+        required: false
+        default: ''
+
+jobs:
+  fix:
+    if: ${{ github.event.workflow_run.conclusion == 'failure' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Flue dependencies
+        run: npm ci
+
+      - name: Run CI fixer agent
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+        run: |
+          JOB="${{ github.event.inputs.job || github.event.workflow_run.name || 'unknown' }}"
+          LOG="${{ github.event.inputs.log || '' }}"
+          npx flue run fix-ci --target node \
+            --payload "$(printf '{"job":"%s","log":"%s"}' "$JOB" "$LOG")"
