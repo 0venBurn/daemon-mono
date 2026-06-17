@@ -1,15 +1,15 @@
 package main
 
 import (
-"fmt"
-"os"
+	"fmt"
+	"os"
 )
 
 func main() {
-d, err := newDaemon(os.Stdout)
+	d, err := newDaemon(os.Stdout)
 	if err != nil {
-fmt.Fprintln(os.Stderr, err)
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
-}
-d.serve(os.Stdin)
+	}
+	d.serve(os.Stdin)
 }
