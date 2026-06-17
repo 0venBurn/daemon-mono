@@ -56,3 +56,50 @@ jobs:
 
       - name: Build
         run: go build ./cmd/daemon
+
+  fix:
+    needs: [lint, test, build]
+    if: failure() && github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Flue dependencies
+        run: npm ci
+
+      - name: Run CI fixer agent
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+        run: |
+          npx flue run fix-ci --target node \
+            --payload '{"job":"ci","log":""}'
+
+      - name: Commit and push fixes
+        if: success()
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git config user.name "ci-fixer[bot]"
+          git config user.email "ci-fixer[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix(ci): auto-fix CI failures
+
+      Auto-fix applied by Flue CI fixer agent (opencode-go/kimi-k2.7-code)."
+          git push
