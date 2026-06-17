@@ -80,7 +80,7 @@ jobs:
           node-version: 22
 
       - name: Install Flue dependencies
-        run: npm ci
+        run: npm install
 
       - name: Run CI fixer agent
         env:
