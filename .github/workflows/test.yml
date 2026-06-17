@@ -59,7 +59,7 @@ jobs:
 
   fix:
     needs: [lint, test, build]
-    if: failure() && github.event_name == 'pull_request'
+    if: failure() && (github.event_name == 'pull_request' || github.event_name == 'push')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -67,7 +67,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref }}
+          ref: ${{ github.head_ref || github.ref_name }}
           fetch-depth: 0
 
       - uses: actions/setup-go@v5
